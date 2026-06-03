@@ -1,7 +1,3 @@
-"""
-Página: Inicio
-Portada del dashboard con resumen general del proyecto.
-"""
 
 import streamlit as st
 import database as db
@@ -10,13 +6,11 @@ from icons import svg, icon_inline
 from shared import init_session_state, render_filters_sidebar
 
 
-# ---- Setup --------------------------------------------------------
 init_session_state()
 ui.inject_css()
 render_filters_sidebar()
 
 
-# ---- Contenido ----------------------------------------------------
 ui.cyber_header(
     "NATURE.MI // DASHBOARD",
     "Sistema de minería de datos · Nature Machine Intelligence · 2025+"
@@ -33,7 +27,6 @@ st.markdown(
 
 ui.scan_line()
 
-# Resumen general
 papers_df = db.get_all_papers()
 kpis = db.compute_kpis(papers_df)
 
@@ -58,7 +51,7 @@ with c4:
 
 st.markdown("")
 
-# Sobre el proyecto
+
 st.markdown(
     f'## {icon_inline("info", "SOBRE EL PROYECTO", size=22)}',
     unsafe_allow_html=True,
@@ -99,7 +92,6 @@ with col_b:
 
 ui.scan_line()
 
-# Distribución temática
 if kpis["by_topic"]:
     st.markdown("### Distribución temática actual")
     cols = st.columns(len(kpis["by_topic"]))

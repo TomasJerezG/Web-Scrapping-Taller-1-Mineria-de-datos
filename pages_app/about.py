@@ -1,8 +1,3 @@
-"""
-Página: Acerca de
-Información técnica del proyecto.
-"""
-
 import streamlit as st
 import database as db
 import ui_components as ui
@@ -39,9 +34,6 @@ st.markdown(
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Stack tecnológico
-# ----------------------------------------------------------------------------
 st.markdown(
     f'## {icon_inline("settings", "STACK TECNOLÓGICO", size=22)}',
     unsafe_allow_html=True,
@@ -71,9 +63,7 @@ with c2:
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Esquema BD
-# ----------------------------------------------------------------------------
+
 st.markdown(
     f'## {icon_inline("database", "ESQUEMA DE LA BASE DE DATOS", size=22)}',
     unsafe_allow_html=True,
@@ -91,7 +81,7 @@ refs (reference_id, reference_text, reference_text_normalized)
 paper_refs (paper_id, reference_id, ref_order)
 """, language="sql")
 
-# Conteos actuales
+
 with db.get_conn() as conn:
     counts = {
         "papers":        conn.execute("SELECT COUNT(*) FROM papers").fetchone()[0],
@@ -110,9 +100,6 @@ for i, (k, v) in enumerate(counts.items()):
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Cumplimiento del taller
-# ----------------------------------------------------------------------------
 st.markdown(
     f'## {icon_inline("activity", "CUMPLIMIENTO DEL TALLER", size=22)}',
     unsafe_allow_html=True,

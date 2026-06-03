@@ -1,7 +1,4 @@
-"""
-Página: Visualizaciones
-5 gráficos interactivos construidos con Plotly según los filtros activos.
-"""
+
 
 import streamlit as st
 import ui_components as ui
@@ -27,8 +24,6 @@ st.caption(
 
 ui.scan_line()
 
-# Streamlit no permite SVG en los labels de st.tabs (solo strings simples),
-# así que usamos símbolos Unicode geométricos coherentes con la estética.
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "◆  LÍNEA TEMPORAL",
     "◇  POR CATEGORÍA",

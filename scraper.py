@@ -1,21 +1,3 @@
-"""
-============================================================================
-scraper.py
-============================================================================
-Módulo de scraping para actualizar la base de datos con papers nuevos
-o métricas actualizadas.
-
-Estrategia HÍBRIDA:
-1. Intenta Nature.com primero (datos completos: accesses, altmetric, refs)
-2. Si Nature retorna 403 (IP de datacenter, ej. Streamlit Cloud),
-   hace fallback a OpenAlex API (sin esos datos pero funcional).
-
-Funciones públicas:
-- list_articles_in_year(year) -> [{url, title, date, ...}]
-- scrape_article(url) -> dict con metadatos completos
-- classify_paper(paper) -> str
-============================================================================
-"""
 
 import re
 import time
@@ -25,13 +7,10 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 
-# ----------------------------------------------------------------------------
-# Configuración
-# ----------------------------------------------------------------------------
 NATURE_BASE = "https://www.nature.com"
 JOURNAL_SLUG = "natmachintell"
 OPENALEX_BASE = "https://api.openalex.org"
-NATURE_MI_OPENALEX_ID = "S4210184325"  # Nature Machine Intelligence en OpenAlex
+NATURE_MI_OPENALEX_ID = "S4210184325" 
 
 HEADERS = {
     "User-Agent": (
@@ -48,9 +27,6 @@ PAUSE_MAX = 2.5
 TIMEOUT = 25
 
 
-# ----------------------------------------------------------------------------
-# Clasificación (idéntica al Taller 1)
-# ----------------------------------------------------------------------------
 GEN_AI_PATTERNS = [
     r"\b(generative\s+(model|ai|adversarial|network)s?)\b",
     r"\b(diffusion\s+(model|process)s?)\b",
@@ -107,9 +83,6 @@ def classify_paper(paper: dict) -> str:
     return "Otros"
 
 
-# ----------------------------------------------------------------------------
-# Utilidades HTTP
-# ----------------------------------------------------------------------------
 def _polite_sleep():
     time.sleep(random.uniform(PAUSE_MIN, PAUSE_MAX))
 
@@ -123,7 +96,6 @@ def _fetch(url: str, timeout: int = TIMEOUT) -> Optional[requests.Response]:
 
 
 def _extract_count(text: Optional[str]) -> Optional[int]:
-    """'10k Accesses' -> 10000, '1.2M' -> 1200000, '523' -> 523."""
     if not text:
         return None
     text = text.strip().lower().replace(",", "")
@@ -161,9 +133,7 @@ def _article_id(url: str) -> str:
     return m.group(1) if m else url.split("/")[-1].split("?")[0]
 
 
-# ----------------------------------------------------------------------------
-# A) Nature.com (modo principal)
-# ----------------------------------------------------------------------------
+
 class NatureBlocked(Exception):
     """Excepción: Nature retornó 403, hay que usar fallback."""
     pass
@@ -179,8 +149,6 @@ def _nature_listing_url(year: int, page: int = 1) -> str:
 
 
 def _list_nature_year(year: int, max_pages: int = 10) -> list[dict]:
-    """Recorre las páginas del listado de Nature de un año dado.
-    Lanza NatureBlocked si la primera petición retorna 403."""
     articles = []
     for page in range(1, max_pages + 1):
         url = _nature_listing_url(year, page)
@@ -218,7 +186,6 @@ def _list_nature_year(year: int, max_pages: int = 10) -> list[dict]:
         articles.extend(page_articles)
         _polite_sleep()
 
-    # Dedup
     seen = set()
     unique = []
     for a in articles:
@@ -229,8 +196,6 @@ def _list_nature_year(year: int, max_pages: int = 10) -> list[dict]:
 
 
 def _scrape_nature_article(url: str) -> dict:
-    """Scrappea metadatos completos de un artículo desde Nature.
-    Lanza NatureBlocked si 403."""
     r = _fetch(url)
     if r is None:
         raise RuntimeError(f"No se pudo descargar {url}")
@@ -256,7 +221,6 @@ def _scrape_nature_article(url: str) -> dict:
     }
     data["n_authors"] = len(data["authors"])
 
-    # Subjects
     subjects = []
     for a in soup.find_all("a", attrs={"data-track-action": "view subject"}):
         s = a.get_text(strip=True)
@@ -266,7 +230,6 @@ def _scrape_nature_article(url: str) -> dict:
         subjects = _meta_list(soup, "dc.subject")
     data["subjects"] = subjects
 
-    # Métricas
     accesses = altmetric = citations = None
     for li in soup.find_all(["li", "p"]):
         txt = li.get_text(" ", strip=True).lower()
@@ -283,7 +246,6 @@ def _scrape_nature_article(url: str) -> dict:
     data["altmetric"] = altmetric
     data["citations_nature"] = citations
 
-    # Referencias
     references = []
     refs_ol = soup.find("ol", class_=re.compile("c-article-references|references", re.I))
     if refs_ol:
@@ -301,9 +263,6 @@ def _scrape_nature_article(url: str) -> dict:
     return data
 
 
-# ----------------------------------------------------------------------------
-# B) OpenAlex (fallback cuando Nature está bloqueado)
-# ----------------------------------------------------------------------------
 def _list_openalex_year(year: int, max_results: int = 200) -> list[dict]:
     """Lista los artículos de Nature Machine Intelligence en OpenAlex para un año.
     Retorna lista en formato compatible con el listado de Nature."""
@@ -322,7 +281,6 @@ def _list_openalex_year(year: int, max_results: int = 200) -> list[dict]:
     out = []
     for w in data.get("results", []):
         doi = (w.get("doi") or "").replace("https://doi.org/", "")
-        # Construir paper_id desde DOI: 10.1038/s42256-025-01166-9 -> s42256-025-01166-9
         pid = doi.split("/")[-1] if "/" in doi else None
         nature_url = f"{NATURE_BASE}/articles/{pid}" if pid else w.get("id")
         out.append({
@@ -336,7 +294,6 @@ def _list_openalex_year(year: int, max_results: int = 200) -> list[dict]:
 
 
 def _abstract_from_inverted(inv: dict) -> Optional[str]:
-    """OpenAlex devuelve abstracts como índice invertido. Reconstruimos."""
     if not inv:
         return None
     positions = []
@@ -348,7 +305,6 @@ def _abstract_from_inverted(inv: dict) -> Optional[str]:
 
 
 def _build_paper_from_openalex(raw: dict, url_fallback: str) -> dict:
-    """Convierte un work de OpenAlex al formato interno de paper."""
     doi = (raw.get("doi") or "").replace("https://doi.org/", "")
     pid = doi.split("/")[-1] if "/" in doi else _article_id(url_fallback)
     authors = [
@@ -370,17 +326,14 @@ def _build_paper_from_openalex(raw: dict, url_fallback: str) -> dict:
         "authors": authors,
         "n_authors": len(authors),
         "subjects": concepts,
-        "accesses": None,            # OpenAlex no tiene accesses
+        "accesses": None,           
         "altmetric": None,
         "citations_nature": raw.get("cited_by_count"),
-        "references": [],            # OpenAlex referencia por ID, no texto plano
+        "references": [],           
         "n_references": raw.get("referenced_works_count", 0),
     }
 
 
-# ----------------------------------------------------------------------------
-# API pública del módulo
-# ----------------------------------------------------------------------------
 def list_articles_in_year(year: int) -> tuple[list[dict], str]:
     """Lista artículos publicados en un año. Devuelve (lista, fuente_usada).
     fuente_usada in {'nature', 'openalex'}."""
@@ -399,7 +352,6 @@ def scrape_article(article_meta: dict) -> Optional[dict]:
         return _build_paper_from_openalex(
             article_meta["_openalex_raw"], article_meta["url"]
         )
-    # Si viene del listado de Nature, intentamos scrapear Nature
     try:
         return _scrape_nature_article(article_meta["url"])
     except NatureBlocked:
@@ -410,8 +362,6 @@ def scrape_article(article_meta: dict) -> Optional[dict]:
 
 
 def _scrape_via_openalex_by_doi(paper_id: str) -> Optional[dict]:
-    """Busca un paper en OpenAlex usando el slug Nature (paper_id).
-    El DOI completo es 10.1038/<paper_id>."""
     if not paper_id:
         return None
     full_doi = f"10.1038/{paper_id}"

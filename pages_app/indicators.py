@@ -1,7 +1,3 @@
-"""
-Página: Indicadores
-KPIs detallados y papers destacados según los filtros activos.
-"""
 
 import streamlit as st
 import database as db
@@ -30,9 +26,6 @@ st.caption(
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# KPIs principales — 5 indicadores
-# ----------------------------------------------------------------------------
 st.markdown(
     f'## {icon_inline("activity", "INDICADORES PRINCIPALES", size=22)}',
     unsafe_allow_html=True,
@@ -55,9 +48,7 @@ with c5:
     ui.kpi_card("Descargas totales", ui.fmt_int(kpis["total_downloads"]),
                 sub="(Accesses)", flavor="magenta")
 
-# ----------------------------------------------------------------------------
-# Papers destacados
-# ----------------------------------------------------------------------------
+
 ui.scan_line()
 st.markdown(
     f'## {icon_inline("diamond-filled", "ARTÍCULOS DESTACADOS", size=22)}',
@@ -85,9 +76,6 @@ if kpis["most_cited"] and kpis["most_cited"]["citations"]:
 else:
     st.info("Sin datos suficientes para mostrar artículos destacados.")
 
-# ----------------------------------------------------------------------------
-# Distribución temática
-# ----------------------------------------------------------------------------
 ui.scan_line()
 st.markdown(
     f'## {icon_inline("bars-stack", "DESGLOSE POR CATEGORÍA", size=22)}',

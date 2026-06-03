@@ -1,7 +1,3 @@
-"""
-Página: Explorar artículos
-Tabla interactiva con todos los campos relevantes y exportación a CSV.
-"""
 
 import streamlit as st
 import ui_components as ui
@@ -27,9 +23,6 @@ st.caption(
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Tabla
-# ----------------------------------------------------------------------------
 display_df = filtered_df.copy()
 display_df["publication_date"] = display_df["publication_date"].dt.strftime("%Y-%m-%d")
 
@@ -58,9 +51,6 @@ st.dataframe(
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Export
-# ----------------------------------------------------------------------------
 col_a, col_b = st.columns([2, 1])
 with col_a:
     st.markdown(

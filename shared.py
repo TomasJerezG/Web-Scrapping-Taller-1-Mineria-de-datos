@@ -1,10 +1,4 @@
-"""
-============================================================================
-shared.py
-============================================================================
-Estado compartido entre páginas y sidebar global con filtros.
-============================================================================
-"""
+
 
 import streamlit as st
 import pandas as pd
@@ -43,7 +37,6 @@ def render_filters_sidebar():
         date_max = pd.Timestamp("2025-12-31").date()
 
     with st.sidebar:
-        # Título de la sección con icono SVG
         st.markdown(
             f'<div style="display:flex;align-items:center;gap:0.5em;'
             f'font-family:Orbitron,monospace;font-weight:700;'
@@ -53,10 +46,6 @@ def render_filters_sidebar():
             unsafe_allow_html=True,
         )
 
-        # Labels personalizados (SVG + texto). Streamlit acepta markdown
-        # en los labels desde versiones recientes vía `label` con HTML
-        # solo si lo precedemos con markdown. Para mantener compatibilidad,
-        # ponemos un caption antes de cada input.
 
         st.markdown(
             f'<div style="margin-top:0.5rem;display:flex;align-items:center;'

@@ -1,24 +1,4 @@
-"""
-============================================================================
-icons.py
-============================================================================
-Iconos SVG inline para el dashboard cyberpunk.
 
-Filosofía:
-  - Outline (1.5-2px stroke) → navegación, sidebar, contextos formales
-  - Geométricos minimalistas → acentos, badges, decoradores
-  - Todos heredan color via 'currentColor' (controlable desde CSS)
-  - 24x24 viewBox estándar (escala con font-size)
-
-Uso:
-    from icons import svg, ICON_*
-    
-    st.markdown(svg("home"), unsafe_allow_html=True)
-    st.markdown(f'{svg("calendar", 16)} Mi label', unsafe_allow_html=True)
-============================================================================
-"""
-
-# Atributos comunes a todos los SVG outline
 _OUTLINE_ATTRS = (
     'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
     'fill="none" stroke="currentColor" stroke-width="1.8" '
@@ -29,12 +9,7 @@ _FILLED_ATTRS = (
     'fill="currentColor"'
 )
 
-
-# ============================================================================
-# ICONOS OUTLINE — para navegación y sidebar
-# ============================================================================
 ICONS_OUTLINE = {
-    # Navegación principal
     "home": '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/>',
     "bar-chart": '<path d="M3 21h18M7 17V9M12 17V5M17 17v-7"/>',
     "activity": '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
@@ -44,14 +19,12 @@ ICONS_OUTLINE = {
     "refresh": '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
     "info": '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
 
-    # Filtros del sidebar
     "calendar": '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
     "tag": '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
     "user": '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     "link": '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
     "search": '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
 
-    # Acciones / utilidades
     "download": '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
     "play": '<polygon points="6 4 20 12 6 20 6 4"/>',
     "filter": '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
@@ -60,11 +33,8 @@ ICONS_OUTLINE = {
 }
 
 
-# ============================================================================
-# ICONOS GEOMÉTRICOS — para acentos, tabs, decoradores
-# ============================================================================
+
 ICONS_GEOMETRIC = {
-    # Formas básicas cyberpunk
     "diamond-filled": '<polygon points="12 2 22 12 12 22 2 12"/>',
     "diamond-outline": '<polygon points="12 2 22 12 12 22 2 12" fill="none" stroke="currentColor" stroke-width="2"/>',
     "triangle-up": '<polygon points="12 4 22 20 2 20"/>',
@@ -75,20 +45,17 @@ ICONS_GEOMETRIC = {
     "hex": '<polygon points="12 2 21 7 21 17 12 22 3 17 3 7"/>',
     "circle-filled": '<circle cx="12" cy="12" r="9"/>',
 
-    # Geométricos compuestos (estilo HUD)
     "corner-tl": '<polyline points="4 10 4 4 10 4" fill="none" stroke="currentColor" stroke-width="2.5"/>',
     "corner-tr": '<polyline points="14 4 20 4 20 10" fill="none" stroke="currentColor" stroke-width="2.5"/>',
     "corner-bl": '<polyline points="4 14 4 20 10 20" fill="none" stroke="currentColor" stroke-width="2.5"/>',
     "corner-br": '<polyline points="14 20 20 20 20 14" fill="none" stroke="currentColor" stroke-width="2.5"/>',
 
-    # Específicos para tabs y headers
     "chart-timeline": '<path d="M3 18l5-5 4 4 9-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="18" r="1.5"/><circle cx="8" cy="13" r="1.5"/><circle cx="12" cy="17" r="1.5"/><circle cx="21" cy="8" r="1.5"/>',
     "donut": '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>',
     "people": '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 21v-1a6 6 0 0 1 12 0v1M14 21v-1a5 5 0 0 1 8-4"/>',
     "bars-stack": '<rect x="3" y="14" width="4" height="7"/><rect x="10" y="10" width="4" height="11"/><rect x="17" y="6" width="4" height="15"/>',
     "scatter": '<circle cx="6" cy="18" r="1.5"/><circle cx="10" cy="12" r="1.5"/><circle cx="14" cy="15" r="1.5"/><circle cx="18" cy="7" r="1.5"/><circle cx="9" cy="6" r="1.5"/><circle cx="17" cy="17" r="1.5"/>',
 
-    # Status
     "online-dot": '<circle cx="12" cy="12" r="6"/>',
     "trophy": '<path d="M6 4h12v4a6 6 0 0 1-12 0V4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 18h6v3H9zM6 6H3v2a3 3 0 0 0 3 3M18 6h3v2a3 3 0 0 1-3 3"/>',
     "fire": '<path d="M12 2c1 4 3 5 3 8a3 3 0 0 1-6 0c0-1 .5-1.5 1-2-1 1-3 3-3 6a6 6 0 0 0 12 0c0-5-5-7-7-12z"/>',
@@ -96,21 +63,8 @@ ICONS_GEOMETRIC = {
 }
 
 
-# ============================================================================
-# API pública
-# ============================================================================
 def svg(name: str, size: int = 18, css_class: str = "", stroke_width: float = None) -> str:
-    """Devuelve un string HTML con el SVG inline.
-    
-    Args:
-        name: nombre del icono (de ICONS_OUTLINE o ICONS_GEOMETRIC)
-        size: tamaño en px (ancho = alto = size)
-        css_class: clases CSS adicionales
-        stroke_width: override del grosor (solo para outline)
-    
-    Returns:
-        String HTML del SVG, listo para usar con unsafe_allow_html=True
-    """
+
     if name in ICONS_OUTLINE:
         body = ICONS_OUTLINE[name]
         attrs = _OUTLINE_ATTRS
@@ -122,10 +76,7 @@ def svg(name: str, size: int = 18, css_class: str = "", stroke_width: float = No
         )
     if name in ICONS_GEOMETRIC:
         body = ICONS_GEOMETRIC[name]
-        # Para los geométricos que ya incluyen fill/stroke en el path,
-        # los atributos base son más simples
         if "<path" in body or "<polygon" in body or "<circle" in body or "<rect" in body or "<polyline" in body:
-            # Si el body ya define fill/stroke, no lo sobreescribimos
             if 'fill="none"' in body or 'stroke="currentColor"' in body:
                 attrs = 'xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"'
             else:
@@ -140,8 +91,6 @@ def svg(name: str, size: int = 18, css_class: str = "", stroke_width: float = No
 
 
 def icon_inline(name: str, label: str = "", size: int = 16, gap_em: float = 0.4) -> str:
-    """Genera HTML con icono + texto en línea (para usar en markdown).
-    Útil para títulos, captions, KPI labels, etc."""
     s = svg(name, size)
     if label:
         return (
@@ -152,7 +101,6 @@ def icon_inline(name: str, label: str = "", size: int = 16, gap_em: float = 0.4)
     return s
 
 
-# CSS específico para los iconos (color y filtros base)
 ICON_CSS = """
 <style>
     .cyber-icon {

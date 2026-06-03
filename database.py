@@ -1,17 +1,3 @@
-"""
-============================================================================
-database.py
-============================================================================
-Capa de acceso a la base de datos SQLite del Taller 1.
-
-Provee funciones para:
-- Conectar a la BD con caching de Streamlit
-- Consultas filtradas (rango fechas, categoría, autor, DOI, keyword)
-- KPIs calculados
-- Insertar nuevos papers desde el scraping de actualización
-- Actualizar métricas (accesses/citas) de papers existentes
-============================================================================
-"""
 
 import sqlite3
 import re
@@ -25,12 +11,8 @@ import streamlit as st
 DB_PATH = Path(__file__).resolve().parent / "revista_q1_2025.sqlite"
 
 
-# ----------------------------------------------------------------------------
-# Conexión
-# ----------------------------------------------------------------------------
 @contextmanager
 def get_conn():
-    """Context manager para conexión SQLite. Garantiza cierre limpio."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try:
@@ -40,17 +22,11 @@ def get_conn():
 
 
 def db_exists() -> bool:
-    """Verifica que el archivo SQLite exista."""
     return DB_PATH.exists()
 
 
-# ----------------------------------------------------------------------------
-# Lecturas con cache
-# ----------------------------------------------------------------------------
 @st.cache_data(ttl=60, show_spinner=False)
 def get_all_papers() -> pd.DataFrame:
-    """Lee toda la tabla papers como DataFrame.
-    Se cachea por 60s; se invalida tras inserciones (clear_cache)."""
     with get_conn() as conn:
         df = pd.read_sql_query(
             """
@@ -63,7 +39,6 @@ def get_all_papers() -> pd.DataFrame:
             """,
             conn,
         )
-    # Parsear fecha a datetime
     df["publication_date"] = pd.to_datetime(df["publication_date"], errors="coerce")
     return df
 
@@ -96,16 +71,12 @@ def get_year_range() -> tuple[int, int]:
 
 
 def clear_all_caches():
-    """Invalidar todas las cachés. Llamar tras insertar/actualizar papers."""
     get_all_papers.clear()
     get_topic_list.clear()
     get_author_list.clear()
     get_year_range.clear()
 
 
-# ----------------------------------------------------------------------------
-# Filtrado en memoria (más simple y rápido con 138 papers)
-# ----------------------------------------------------------------------------
 def filter_papers(
     df: pd.DataFrame,
     date_range: Optional[tuple] = None,
@@ -114,7 +85,6 @@ def filter_papers(
     doi: Optional[str] = None,
     keyword: Optional[str] = None,
 ) -> pd.DataFrame:
-    """Aplica los filtros del sidebar sobre el DataFrame de papers."""
     result = df.copy()
 
     if date_range and len(date_range) == 2:
@@ -127,7 +97,6 @@ def filter_papers(
         result = result[result["topic_label"].isin(topics)]
 
     if author:
-        # Buscar el autor en authors_raw (insensible a mayúsculas)
         result = result[
             result["authors_raw"].fillna("").str.contains(
                 re.escape(author), case=False, regex=True
@@ -140,7 +109,6 @@ def filter_papers(
         ]
 
     if keyword:
-        # Buscar en título y abstract
         kw = re.escape(keyword)
         in_title = result["title"].fillna("").str.contains(kw, case=False, regex=True)
         in_abs = result["abstract"].fillna("").str.contains(kw, case=False, regex=True)
@@ -149,11 +117,7 @@ def filter_papers(
     return result.reset_index(drop=True)
 
 
-# ----------------------------------------------------------------------------
-# KPIs calculados
-# ----------------------------------------------------------------------------
 def compute_kpis(df: pd.DataFrame) -> dict:
-    """Calcula los indicadores principales del dashboard."""
     if df.empty:
         return {
             "total_papers": 0, "avg_authors": 0, "avg_citations": 0,
@@ -177,25 +141,19 @@ def compute_kpis(df: pd.DataFrame) -> dict:
     }
 
 
-# ----------------------------------------------------------------------------
-# Insertar / actualizar (para el botón de scraping)
-# ----------------------------------------------------------------------------
 def get_existing_dois() -> set[str]:
-    """Devuelve el set de DOIs ya almacenados, para detectar nuevos papers."""
     with get_conn() as conn:
         rows = conn.execute("SELECT doi FROM papers WHERE doi IS NOT NULL").fetchall()
     return {r["doi"] for r in rows}
 
 
 def get_existing_paper_ids() -> set[str]:
-    """Devuelve el set de paper_id (slug Nature) ya almacenados."""
     with get_conn() as conn:
         rows = conn.execute("SELECT paper_id FROM papers").fetchall()
     return {r["paper_id"] for r in rows}
 
 
 def get_recent_paper_ids(n: int = 5) -> list[str]:
-    """Devuelve los IDs de los N papers más recientes (por publication_date)."""
     with get_conn() as conn:
         rows = conn.execute(
             "SELECT paper_id FROM papers ORDER BY publication_date DESC LIMIT ?",
@@ -205,8 +163,6 @@ def get_recent_paper_ids(n: int = 5) -> list[str]:
 
 
 def insert_paper(paper: dict, topic_label: str) -> bool:
-    """Inserta un paper nuevo en todas las tablas relacionadas.
-    Retorna True si lo insertó, False si ya existía."""
     if not paper.get("paper_id"):
         return False
     with get_conn() as conn:
@@ -248,7 +204,6 @@ def insert_paper(paper: dict, topic_label: str) -> bool:
             ),
         )
 
-        # Autores
         for order, name in enumerate(paper.get("authors", []), start=1):
             name = (name or "").strip()
             if not name:
@@ -264,7 +219,6 @@ def insert_paper(paper: dict, topic_label: str) -> bool:
                 (paper["paper_id"], aid, order),
             )
 
-        # Referencias
         for order, ref in enumerate(paper.get("references", []), start=1):
             ref = (ref or "").strip()
             if not ref:
@@ -290,7 +244,6 @@ def insert_paper(paper: dict, topic_label: str) -> bool:
 
 
 def update_paper_metrics(paper_id: str, paper: dict) -> bool:
-    """Actualiza solo métricas (citations, downloads, altmetric) de un paper existente."""
     with get_conn() as conn:
         cur = conn.cursor()
         cur.execute(
@@ -312,9 +265,6 @@ def update_paper_metrics(paper_id: str, paper: dict) -> bool:
         return cur.rowcount > 0
 
 
-# ----------------------------------------------------------------------------
-# Utilidades internas
-# ----------------------------------------------------------------------------
 def _parse_year(date_str):
     if not date_str:
         return None

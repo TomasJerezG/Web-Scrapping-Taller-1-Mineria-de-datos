@@ -1,7 +1,4 @@
-"""
-Página: Actualizar BD
-Botón de scraping que cumple la sección 2.1.7 del taller.
-"""
+
 
 import datetime as _dt
 import streamlit as st
@@ -25,9 +22,6 @@ ui.cyber_header(
     "Búsqueda automática de artículos nuevos en Nature MI"
 )
 
-# ----------------------------------------------------------------------------
-# Estado actual de la BD
-# ----------------------------------------------------------------------------
 papers_df = db.get_all_papers()
 kpis = db.compute_kpis(papers_df)
 
@@ -47,9 +41,6 @@ with c3:
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Botón principal de scraping
-# ----------------------------------------------------------------------------
 st.markdown(
     f'## {icon_inline("refresh", "BUSCAR ARTÍCULOS NUEVOS", size=22)}',
     unsafe_allow_html=True,
@@ -75,7 +66,6 @@ st.markdown(
 
 st.markdown("")
 
-# Espacio centrado para el botón
 btn_col = st.columns([1, 2, 1])[1]
 with btn_col:
     do_scrape = st.button(
@@ -145,7 +135,6 @@ if do_scrape:
             if errors:
                 st.warning(f"No se pudo reconsultar: `{', '.join(errors)}`")
 
-        # Invalidar caché y refrescar
         db.clear_all_caches()
 
         ui.scan_line()
@@ -165,9 +154,7 @@ if do_scrape:
 
 ui.scan_line()
 
-# ----------------------------------------------------------------------------
-# Información técnica
-# ----------------------------------------------------------------------------
+
 with st.expander("Detalles técnicos del scraper", expanded=False):
     st.markdown(
         """

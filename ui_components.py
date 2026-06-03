@@ -1,19 +1,3 @@
-"""
-============================================================================
-ui_components.py
-============================================================================
-Componentes visuales reutilizables del dashboard.
-
-ESTÉTICA: Cyberpunk neón morado
-  - Fondo:       #0a0612 (negro violáceo)
-  - Surface:     #1a0d2e (morado oscuro)
-  - Primary:     #bd00ff (magenta neón)
-  - Accent:      #00f0ff (cyan eléctrico)
-  - Secondary:   #ff006e (rosa neón)
-  - Glow:        #7b2cbf (morado medio)
-  - Neon green:  #39ff14
-============================================================================
-"""
 
 import pandas as pd
 import streamlit as st
@@ -23,22 +7,19 @@ import plotly.graph_objects as go
 from icons import svg, ICON_CSS
 
 
-# ----------------------------------------------------------------------------
-# Paleta cyberpunk
-# ----------------------------------------------------------------------------
 COLORS = {
     "bg":         "#0a0612",
     "surface":    "#1a0d2e",
     "surface_2":  "#241640",
     "border":     "#3d1f6b",
-    "primary":    "#bd00ff",   # magenta neón principal
-    "accent":     "#00f0ff",   # cyan eléctrico
-    "secondary":  "#ff006e",   # rosa neón
-    "glow":       "#7b2cbf",   # morado medio
+    "primary":    "#bd00ff",  
+    "accent":     "#00f0ff",   
+    "secondary":  "#ff006e",   
+    "glow":       "#7b2cbf",   
     "neon_green": "#39ff14",
     "neon_yellow":"#ffb800",
-    "text":       "#e8d8ff",   # blanco con tinte lila
-    "text_muted": "#9d8bb8",   # gris violáceo
+    "text":       "#e8d8ff",   
+    "text_muted": "#9d8bb8",   
 }
 
 TOPIC_COLORS = {
@@ -74,9 +55,6 @@ PLOTLY_THEME = {
 }
 
 
-# ----------------------------------------------------------------------------
-# CSS cyberpunk
-# ----------------------------------------------------------------------------
 CUSTOM_CSS = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@600;700;900&display=swap');
@@ -646,9 +624,7 @@ def status_badge(text: str, kind: str = "online"):
     )
 
 
-# ----------------------------------------------------------------------------
-# KPI cards
-# ----------------------------------------------------------------------------
+
 def kpi_card(label: str, value: str, sub: str = "", flavor: str = ""):
     klass = f"kpi-card kpi-{flavor}" if flavor else "kpi-card"
     sub_html = f'<div class="kpi-sub">{sub}</div>' if sub else ""
@@ -685,9 +661,6 @@ def fmt_float(n, d=2) -> str:
     return f"{float(n):.{d}f}"
 
 
-# ----------------------------------------------------------------------------
-# Gráficos Plotly
-# ----------------------------------------------------------------------------
 def chart_publications_timeline(df: pd.DataFrame) -> go.Figure:
     if df.empty or df["publication_date"].isna().all():
         return _empty_fig("Sin datos para mostrar")
